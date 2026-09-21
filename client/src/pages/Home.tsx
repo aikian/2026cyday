@@ -26,6 +26,7 @@ function playBirthdayMelody() {
   const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AudioContextClass) return;
   const context = new AudioContextClass();
+  let loopTimer: number | undefined;
   const start = () => {
     const notes = [392,392,440,392,523,494,392,392,440,392,587,523,392,392,784,659,523,494,440,698,698,659,523,587,523];
     const lengths = [0.22,0.22,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.9];
@@ -43,9 +44,11 @@ function playBirthdayMelody() {
       oscillator.stop(cursor + lengths[index]);
       cursor += lengths[index] + 0.035;
     });
-    window.setTimeout(() => context.close(), Math.ceil((cursor - context.currentTime + 1) * 1000));
+    const cycleDuration = cursor - context.currentTime + 0.4;
+    loopTimer = window.setTimeout(start, Math.ceil(cycleDuration * 1000));
   };
   context.resume().then(start).catch(start);
+  window.addEventListener("pagehide", () => { if (loopTimer) window.clearTimeout(loopTimer); void context.close(); }, { once: true });
 }
 
 export default function Home() {
@@ -78,7 +81,7 @@ export default function Home() {
     <main className={`poster-page ${introDone ? "is-ready" : "is-opening"}`}>
       {(celebrate || bursting) && <Confetti />}
       {bursting && <div className="gift-burst" aria-hidden="true"><span /><span /><span /></div>}
-      <div className="poster-topbar"><span><Sparkles size={13} /> CYDAY 2026</span><span className="tilt-label">parallax / motion enabled</span></div>
+      <div className="poster-topbar"><span><Sparkles size={13} /> CYDAY 2026</span><span className="tilt-label">parallax / melody looping</span></div>
       <section className="poster-frame" style={{ transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)` }}>
         <img className="poster-art" src={asset("final_poster_used_for_split.png")} alt="채영아 생일 축하해 포스터" />
         <div className="poster-sheen" aria-hidden="true" />
