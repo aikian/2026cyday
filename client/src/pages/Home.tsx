@@ -26,23 +26,26 @@ function playBirthdayMelody() {
   const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AudioContextClass) return;
   const context = new AudioContextClass();
-  const notes = [392,392,440,392,523,494,392,392,440,392,587,523,392,392,784,659,523,494,440,698,698,659,523,587,523];
-  const lengths = [0.22,0.22,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.9];
-  let cursor = context.currentTime + 0.05;
-  notes.forEach((frequency, index) => {
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = index % 3 === 0 ? "triangle" : "sine";
-    oscillator.frequency.value = frequency;
-    gain.gain.setValueAtTime(0.0001, cursor);
-    gain.gain.exponentialRampToValueAtTime(0.12, cursor + 0.025);
-    gain.gain.exponentialRampToValueAtTime(0.0001, cursor + lengths[index] - 0.035);
-    oscillator.connect(gain).connect(context.destination);
-    oscillator.start(cursor);
-    oscillator.stop(cursor + lengths[index]);
-    cursor += lengths[index] + 0.035;
-  });
-  window.setTimeout(() => context.close(), Math.ceil((cursor - context.currentTime + 1) * 1000));
+  const start = () => {
+    const notes = [392,392,440,392,523,494,392,392,440,392,587,523,392,392,784,659,523,494,440,698,698,659,523,587,523];
+    const lengths = [0.22,0.22,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.9];
+    let cursor = context.currentTime + 0.05;
+    notes.forEach((frequency, index) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = index % 3 === 0 ? "triangle" : "sine";
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, cursor);
+      gain.gain.exponentialRampToValueAtTime(0.14, cursor + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.0001, cursor + lengths[index] - 0.035);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start(cursor);
+      oscillator.stop(cursor + lengths[index]);
+      cursor += lengths[index] + 0.035;
+    });
+    window.setTimeout(() => context.close(), Math.ceil((cursor - context.currentTime + 1) * 1000));
+  };
+  context.resume().then(start).catch(start);
 }
 
 export default function Home() {
@@ -51,6 +54,7 @@ export default function Home() {
   const [celebrate, setCelebrate] = useState(false);
   const [introDone, setIntroDone] = useState(false);
   const [visited, setVisited] = useState<Set<number>>(new Set());
+  const [bursting, setBursting] = useState(false);
 
   useEffect(() => {
     const onPointer = (e: MouseEvent) => {
@@ -72,7 +76,8 @@ export default function Home() {
 
   return (
     <main className={`poster-page ${introDone ? "is-ready" : "is-opening"}`}>
-      {celebrate && <Confetti />}
+      {(celebrate || bursting) && <Confetti />}
+      {bursting && <div className="gift-burst" aria-hidden="true"><span /><span /><span /></div>}
       <div className="poster-topbar"><span><Sparkles size={13} /> CYDAY 2026</span><span className="tilt-label">parallax / motion enabled</span></div>
       <section className="poster-frame" style={{ transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)` }}>
         <img className="poster-art" src={asset("final_poster_used_for_split.png")} alt="채영아 생일 축하해 포스터" />
@@ -84,7 +89,7 @@ export default function Home() {
       </section>
       <section id="after-poster" className={`after-poster ${visited.size === 8 ? "archive-complete" : ""}`}><p className="after-kicker">AN EDITORIAL BIRTHDAY ARCHIVE</p><div className="archive-progress">{String(visited.size).padStart(2, "0")} / 08 NOTES EXPLORED</div><h1>{visited.size === 8 ? <>ARCHIVE<br /><em>COMPLETE</em></> : <>한 장의 포스터에 담은<br /><em>여덟 개의 마음</em></>}</h1><p>{visited.size === 8 ? <>모든 장면이 열렸습니다.<br />채영아, 네가 좋아하는 것들로 가득한 한 해가 되길.</> : <>사진과 문장으로 이어지는 작은 아카이브.<br />카드를 선택하면 각 장면의 메시지가 펼쳐집니다.</>}</p><div className="after-line"><span /> {visited.size === 8 ? "ALL NOTES UNLOCKED" : "08 NOTES / 2026.09.22"} <span /></div></section>
       {selected !== null && <div className="memory-modal" role="dialog" aria-modal="true" aria-label="생일 카드 상세" onClick={() => setSelected(null)}><div className="memory-sheet" onClick={e => e.stopPropagation()}><button className="close-memory" onClick={() => setSelected(null)} aria-label="닫기"><X size={19} /></button><div className="memory-photo"><img src={asset(memories[selected][0])} alt={memories[selected][1]} /></div><div className="memory-details"><span className="memory-tag">FIELD NOTE / 0{selected + 1}</span><h2>{memories[selected][1]}</h2><p>{memories[selected][2]}</p><div className="memory-heart"><Heart fill="currentColor" size={16} /> {memories[selected][3]}</div></div></div></div>}
-      {!introDone && <div className="opening-curtain"><div className="opening-rule" /><p className="opening-kicker">A PRIVATE EDITION / 2026</p><h2>For Chaeyoung</h2><p className="opening-copy">A living birthday poster,<br />assembled from eight little wishes.</p><button onClick={() => { playBirthdayMelody(); setIntroDone(true); }}>ENTER THE ARCHIVE <ArrowDown size={15} /></button><span className="opening-foot">01 / 01 — open slowly · melody ready</span></div>}
+      {!introDone && <div className="opening-curtain"><div className="opening-rule" /><p className="opening-kicker">A PRIVATE EDITION / 2026</p><h2>For Chaeyoung</h2><p className="opening-copy">A living birthday poster,<br />assembled from eight little wishes.</p><button onClick={() => { playBirthdayMelody(); setBursting(true); setIntroDone(true); window.setTimeout(() => setBursting(false), 1450); }}>선물 열기 <ArrowDown size={15} /></button><span className="opening-foot">01 / 01 — open slowly · melody ready</span></div>}
     </main>
   );
 }
