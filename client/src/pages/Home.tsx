@@ -56,7 +56,6 @@ export default function Home() {
   const [selected, setSelected] = useState<number | null>(null);
   const [celebrate, setCelebrate] = useState(false);
   const [introDone, setIntroDone] = useState(false);
-  const [visited, setVisited] = useState<Set<number>>(new Set());
   const [bursting, setBursting] = useState(false);
 
   useEffect(() => {
@@ -72,7 +71,6 @@ export default function Home() {
 
   const openMemory = (index: number) => {
     setSelected(index);
-    setVisited(previous => new Set(previous).add(index));
     setCelebrate(true);
     window.setTimeout(() => setCelebrate(false), 2400);
   };
@@ -88,9 +86,7 @@ export default function Home() {
         <div className="poster-hotspots" aria-label="생일 축하 카드 사진들">
           {memories.map((memory, i) => <button key={memory[0]} className={`hotspot hotspot-${i + 1}`} onClick={() => openMemory(i)} aria-label={`${memory[1]} 카드 열기`}><span>♡</span></button>)}
         </div>
-        <button className="poster-scroll" onClick={() => document.getElementById("after-poster")?.scrollIntoView({ behavior: "smooth" })} aria-label="아래로 스크롤"><ArrowDown size={16} /></button>
       </section>
-      <section id="after-poster" className={`after-poster ${visited.size === 8 ? "archive-complete" : ""}`}><p className="after-kicker">AN EDITORIAL BIRTHDAY ARCHIVE</p><div className="archive-progress">{String(visited.size).padStart(2, "0")} / 08 NOTES EXPLORED</div><h1>{visited.size === 8 ? <>ARCHIVE<br /><em>COMPLETE</em></> : <>한 장의 포스터에 담은<br /><em>여덟 개의 마음</em></>}</h1><p>{visited.size === 8 ? <>모든 장면이 열렸습니다.<br />채영아, 네가 좋아하는 것들로 가득한 한 해가 되길.</> : <>사진과 문장으로 이어지는 작은 아카이브.<br />카드를 선택하면 각 장면의 메시지가 펼쳐집니다.</>}</p><div className="after-line"><span /> {visited.size === 8 ? "ALL NOTES UNLOCKED" : "08 NOTES / 2026.09.22"} <span /></div></section>
       {selected !== null && <div className="memory-modal" role="dialog" aria-modal="true" aria-label="생일 카드 상세" onClick={() => setSelected(null)}><div className="memory-sheet" onClick={e => e.stopPropagation()}><button className="close-memory" onClick={() => setSelected(null)} aria-label="닫기"><X size={19} /></button><div className="memory-photo"><img src={asset(memories[selected][0])} alt={memories[selected][1]} /></div><div className="memory-details"><span className="memory-tag">FIELD NOTE / 0{selected + 1}</span><h2>{memories[selected][1]}</h2><p>{memories[selected][2]}</p><div className="memory-heart"><Heart fill="currentColor" size={16} /> {memories[selected][3]}</div></div></div></div>}
       {!introDone && <div className="opening-curtain"><div className="opening-rule" /><p className="opening-kicker">A PRIVATE EDITION / 2026</p><h2>For Chaeyoung</h2><p className="opening-copy">A living birthday poster,<br />assembled from eight little wishes.</p><button onClick={() => { playBirthdayMelody(); setBursting(true); setIntroDone(true); window.setTimeout(() => setBursting(false), 1450); }}>선물 열기 <ArrowDown size={15} /></button><span className="opening-foot">01 / 01 — open slowly · melody ready</span></div>}
     </main>
