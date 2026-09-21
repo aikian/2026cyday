@@ -8,7 +8,7 @@ html { scroll-behavior:smooth; }
 body { margin:0; background:var(--paper); color:var(--ink); font-family:'Gowun Batang', serif; }
 button { font:inherit; border:0; cursor:pointer; }
 .birthday-page { min-height:100vh; overflow:hidden; position:relative; background:linear-gradient(135deg,#f8e8df 0%,#f5d2d0 48%,#edbfc4 100%); }
-.grain { position:fixed; inset:0; pointer-events:none; z-index:20; opacity:.15; background-image:url('/manus-storage/00_base_canvas_14e2a590.png'); mix-blend-mode:multiply; }
+.grain { position:fixed; inset:0; pointer-events:none; z-index:20; opacity:.16; background-image:repeating-linear-gradient(0deg, rgba(80,45,50,.06) 0, rgba(80,45,50,.06) 1px, transparent 1px, transparent 4px); mix-blend-mode:multiply; }
 .topbar { position:absolute; z-index:10; top:26px; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:0 clamp(20px,5vw,78px); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; }
 .topbar-mark { display:flex; align-items:center; gap:8px; color:var(--coral); font-weight:500; }.sound-button { color:var(--ink); background:transparent; opacity:.7; display:flex; gap:8px; align-items:center; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.05em; }.sound-button:hover { opacity:1; }
 .container { width:min(1180px,100%); margin:0 auto; padding-left:clamp(20px,5vw,70px); padding-right:clamp(20px,5vw,70px); }

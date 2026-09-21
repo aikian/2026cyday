@@ -1,21 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown, ChevronLeft, ChevronRight, Heart, Sparkles, Volume2, VolumeX } from "lucide-react";
 
-const A = "/manus-storage/";
+const A = `${import.meta.env.BASE_URL}assets/`;
+const asset = (name: string) => `${A}${name}`;
 const photos = [
-  ["/manus-storage/01_card_fruit_store_e30c059d.png", "우리의 알록달록한 하루", "어디를 가도 너와 함께면 작은 장면이 영화가 돼."],
-  ["/manus-storage/02_card_gyeongsanggamyeong_park_d094ecd6.png", "천천히 걷던 오후", "이런 평범한 시간이 오래오래 기억에 남기를."],
-  ["/manus-storage/03_card_americano_0b22e568.png", "한 잔의 여유", "네가 좋아하는 것들로 하루가 더 따뜻해져."],
-  ["/manus-storage/04_card_isanghwa_birthplace_57fdf2a3.png", "같이 발견한 풍경", "올해도 새롭고 예쁜 장면들을 많이 만나자."],
-  ["/manus-storage/07_card_cat_cafe_039a16f0.png", "귀여움 한 스푼", "웃음이 터지는 순간은 늘 예고 없이 찾아오니까."],
-  ["/manus-storage/08_card_happy_hair_21a4e6cc.png", "가장 너다운 순간", "네가 너답게 빛나는 모든 순간을 응원해."],
+  [asset("01_card_fruit_store.png"), "우리의 알록달록한 하루", "어디를 가도 너와 함께면 작은 장면이 영화가 돼."],
+  [asset("02_card_gyeongsanggamyeong_park.png"), "천천히 걷던 오후", "이런 평범한 시간이 오래오래 기억에 남기를."],
+  [asset("03_card_americano.png"), "한 잔의 여유", "네가 좋아하는 것들로 하루가 더 따뜻해져."],
+  [asset("04_card_isanghwa_birthplace.png"), "같이 발견한 풍경", "올해도 새롭고 예쁜 장면들을 많이 만나자."],
+  [asset("07_card_cat_cafe.png"), "귀여움 한 스푼", "웃음이 터지는 순간은 늘 예고 없이 찾아오니까."],
+  [asset("08_card_happy_hair.png"), "가장 너다운 순간", "네가 너답게 빛나는 모든 순간을 응원해."],
 ];
 
 const letters = [
-  "/manus-storage/01_tile_chae_075999d4.png", "/manus-storage/02_tile_yeong_90af1a62.png",
-  "/manus-storage/03_tile_a_f70f94bb.png", "/manus-storage/04_tile_saeng_1bd31357.png",
-  "/manus-storage/05_tile_il_6064e021.png", "/manus-storage/06_tile_chuk_a6621d53.png",
-  "/manus-storage/07_tile_ha_95811206.png", "/manus-storage/08_tile_hae_778cfebc.png",
+  asset("01_tile_chae.png"), asset("02_tile_yeong.png"), asset("03_tile_a.png"), asset("04_tile_saeng.png"),
+  asset("05_tile_il.png"), asset("06_tile_chuk.png"), asset("07_tile_ha.png"), asset("08_tile_hae.png"),
 ];
 
 function Confetti() {
@@ -74,11 +73,11 @@ export default function Home() {
         <div className="poster-wrap" style={{ transform: `rotateX(var(--tilt-y)) rotateY(var(--tilt-x))` }}>
           <div className="poster-shadow" />
           <div className="poster-card">
-            <img className="poster-base" src={`${A}01_center_pink_wash_cfc147c7.png`} alt="핑크 종이 질감" />
-            <img className="poster-decor decor-left" src={`${A}07_left_bouquet_and_mid_heart_da733f2b.png`} alt="꽃 장식" />
-            <img className="poster-decor decor-right" src={`${A}08_right_flower_and_heart_5e1aeaa5.png`} alt="꽃과 하트 장식" />
-            <img className="poster-decor decor-top" src={`${A}03_top_ribbon_778b6b4e.png`} alt="리본" />
-            <img className="poster-decor decor-cat" src={`${A}11_cat_doodle_17271d7e.png`} alt="고양이 낙서" />
+            <img className="poster-base" src={`${A}01_center_pink_wash.png`} alt="핑크 종이 질감" />
+            <img className="poster-decor decor-left" src={`${A}07_left_bouquet_and_mid_heart.png`} alt="꽃 장식" />
+            <img className="poster-decor decor-right" src={`${A}08_right_flower_and_heart.png`} alt="꽃과 하트 장식" />
+            <img className="poster-decor decor-top" src={`${A}03_top_ribbon.png`} alt="리본" />
+            <img className="poster-decor decor-cat" src={`${A}11_cat_doodle.png`} alt="고양이 낙서" />
             <div className="poster-type">HAPPY<br /><span>BIRTHDAY</span></div>
             <div className="poster-name">CHAeyoung</div>
             <div className="poster-date">21 · 09 · 2026</div>
@@ -104,7 +103,7 @@ export default function Home() {
       </section>
 
       <section id="message" className="message-section">
-        <img className="message-flower" src={`${A}14_bottom_right_note_and_flowers_f045d83c.png`} alt="꽃 장식" />
+        <img className="message-flower" src={`${A}14_bottom_right_note_and_flowers.png`} alt="꽃 장식" />
         <div className="message-paper">
           <span className="paper-label">a note for you</span>
           <h2>채영에게,</h2>
