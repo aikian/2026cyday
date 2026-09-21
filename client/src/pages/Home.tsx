@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { ArrowDown, Heart, Sparkles, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowDown, Heart, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 
 const A = `${import.meta.env.BASE_URL}assets/`;
 const asset = (name: string) => `${A}${name}`;
@@ -27,7 +27,14 @@ function playBirthdayMelody() {
   if (!AudioContextClass) return;
   const context = new AudioContextClass();
   let loopTimer: number | undefined;
+  let stopped = false;
+  const stop = () => {
+    stopped = true;
+    if (loopTimer) window.clearTimeout(loopTimer);
+    void context.close();
+  };
   const start = () => {
+    if (stopped) return;
     const notes = [392,392,440,392,523,494,392,392,440,392,587,523,392,392,784,659,523,494,440,698,698,659,523,587,523];
     const lengths = [0.22,0.22,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.42,0.72,0.22,0.22,0.42,0.42,0.42,0.9];
     let cursor = context.currentTime + 0.05;
@@ -48,7 +55,8 @@ function playBirthdayMelody() {
     loopTimer = window.setTimeout(start, Math.ceil(cycleDuration * 1000));
   };
   context.resume().then(start).catch(start);
-  window.addEventListener("pagehide", () => { if (loopTimer) window.clearTimeout(loopTimer); void context.close(); }, { once: true });
+  window.addEventListener("pagehide", stop, { once: true });
+  return stop;
 }
 
 export default function Home() {
@@ -57,6 +65,8 @@ export default function Home() {
   const [celebrate, setCelebrate] = useState(false);
   const [introDone, setIntroDone] = useState(false);
   const [bursting, setBursting] = useState(false);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const stopMusicRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const onPointer = (e: MouseEvent) => {
@@ -75,11 +85,22 @@ export default function Home() {
     window.setTimeout(() => setCelebrate(false), 2400);
   };
 
+  const toggleMusic = () => {
+    if (musicPlaying) {
+      stopMusicRef.current?.();
+      stopMusicRef.current = null;
+      setMusicPlaying(false);
+      return;
+    }
+    stopMusicRef.current = playBirthdayMelody() || null;
+    setMusicPlaying(true);
+  };
+
   return (
     <main className={`poster-page ${introDone ? "is-ready" : "is-opening"}`}>
       {(celebrate || bursting) && <Confetti />}
       {bursting && <div className="gift-burst" aria-hidden="true"><span /><span /><span /></div>}
-      <div className="poster-topbar"><span><Sparkles size={13} /> CYDAY 2026</span><span className="tilt-label">parallax / melody looping</span></div>
+      <div className="poster-topbar"><span><Sparkles size={13} /> CYDAY 2026</span><div className="poster-controls"><span className="tilt-label">parallax / melody looping</span><button className="music-toggle" onClick={toggleMusic} aria-label={musicPlaying ? "음악 끄기" : "음악 켜기"}>{musicPlaying ? <Volume2 size={14} /> : <VolumeX size={14} />}<span>{musicPlaying ? "sound on" : "sound off"}</span></button></div></div>
       <section className="poster-frame" style={{ transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)` }}>
         <img className="poster-art" src={asset("final_poster_used_for_split.png")} alt="채영아 생일 축하해 포스터" />
         <div className="poster-sheen" aria-hidden="true" />
@@ -88,7 +109,7 @@ export default function Home() {
         </div>
       </section>
       {selected !== null && <div className="memory-modal" role="dialog" aria-modal="true" aria-label="생일 카드 상세" onClick={() => setSelected(null)}><div className="memory-sheet" onClick={e => e.stopPropagation()}><button className="close-memory" onClick={() => setSelected(null)} aria-label="닫기"><X size={19} /></button><div className="memory-photo"><img src={asset(memories[selected][0])} alt={memories[selected][1]} /></div><div className="memory-details"><span className="memory-tag">FIELD NOTE / 0{selected + 1}</span><h2>{memories[selected][1]}</h2><p>{memories[selected][2]}</p><div className="memory-heart"><Heart fill="currentColor" size={16} /> {memories[selected][3]}</div></div></div></div>}
-      {!introDone && <div className="opening-curtain"><div className="opening-rule" /><p className="opening-kicker">A PRIVATE EDITION / 2026</p><h2>For Chaeyoung</h2><p className="opening-copy">A living birthday poster,<br />assembled from eight little wishes.</p><button onClick={() => { playBirthdayMelody(); setBursting(true); setIntroDone(true); window.setTimeout(() => setBursting(false), 1450); }}>선물 열기 <ArrowDown size={15} /></button><span className="opening-foot">01 / 01 — open slowly · melody ready</span></div>}
+      {!introDone && <div className="opening-curtain"><div className="opening-rule" /><p className="opening-kicker">A PRIVATE EDITION / 2026</p><h2>For Chaeyoung</h2><p className="opening-copy">A living birthday poster,<br />assembled from eight little wishes.</p><button onClick={() => { stopMusicRef.current = playBirthdayMelody() || null; setMusicPlaying(true); setBursting(true); setIntroDone(true); window.setTimeout(() => setBursting(false), 1450); }}>선물 열기 <ArrowDown size={15} /></button><span className="opening-foot">01 / 01 — open slowly · melody ready</span></div>}
     </main>
   );
 }
