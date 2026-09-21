@@ -1,122 +1,58 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowDown, ChevronLeft, ChevronRight, Heart, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowDown, Heart, Sparkles, X } from "lucide-react";
 
 const A = `${import.meta.env.BASE_URL}assets/`;
 const asset = (name: string) => `${A}${name}`;
-const photos = [
-  [asset("01_card_fruit_store.png"), "우리의 알록달록한 하루", "어디를 가도 너와 함께면 작은 장면이 영화가 돼."],
-  [asset("02_card_gyeongsanggamyeong_park.png"), "천천히 걷던 오후", "이런 평범한 시간이 오래오래 기억에 남기를."],
-  [asset("03_card_americano.png"), "한 잔의 여유", "네가 좋아하는 것들로 하루가 더 따뜻해져."],
-  [asset("04_card_isanghwa_birthplace.png"), "같이 발견한 풍경", "올해도 새롭고 예쁜 장면들을 많이 만나자."],
-  [asset("07_card_cat_cafe.png"), "귀여움 한 스푼", "웃음이 터지는 순간은 늘 예고 없이 찾아오니까."],
-  [asset("08_card_happy_hair.png"), "가장 너다운 순간", "네가 너답게 빛나는 모든 순간을 응원해."],
-];
 
-const letters = [
-  asset("01_tile_chae.png"), asset("02_tile_yeong.png"), asset("03_tile_a.png"), asset("04_tile_saeng.png"),
-  asset("05_tile_il.png"), asset("06_tile_chuk.png"), asset("07_tile_ha.png"), asset("08_tile_hae.png"),
+const memories = [
+  ["01_card_fruit_store.png", "① 과일 채소 (채)", "싱싱한 채소처럼 언제나 건강하길!", "fresh & happy"],
+  ["02_card_gyeongsanggamyeong_park.png", "② 경상감영공원 (영)", "좋은 추억이 가득하길!", "good memories"],
+  ["03_card_americano.png", "③ 아메리카노 (아)", "아이스아메리카노처럼 시원하고 행복한 하루하루!", "cool days"],
+  ["04_card_isanghwa_birthplace.png", "④ 이상화 생가 (생)", "항상 생기가 가득하고 빛나는 너!", "shine on"],
+  ["05_card_trash_bag.png", "⑤ 쓰레기봉투 (일)", "언제나 좋은 일들만 가득하길!", "good things"],
+  ["06_card_kaci_architecture.png", "⑥ 한국건축 (축)", "축하할 일이 매일 늘어나길!", "more to celebrate"],
+  ["07_card_cat_cafe.png", "⑦ 집사의 하루 (하)", "하고 싶은 일 다 하면서 지내자!", "do what you love"],
+  ["08_card_happy_hair.png", "⑧ 해피 (해)", "언제나 해피한 너의 하루를 응원해!", "happy always"],
 ];
 
 function Confetti() {
-  const pieces = useMemo(() => Array.from({ length: 54 }, (_, i) => ({
-    left: `${(i * 37) % 100}%`, delay: `${(i % 11) * 0.08}s`, color: ["#f25b78", "#f6b44b", "#855fc4", "#6eaea0"][i % 4], rotate: `${(i * 31) % 180}deg`,
+  const pieces = useMemo(() => Array.from({ length: 32 }, (_, i) => ({
+    left: `${(i * 43) % 100}%`, delay: `${(i % 8) * 70}ms`, color: ["#f46b8a", "#efb04e", "#71aaa0", "#8a61c5"][i % 4],
   })), []);
-  return <div className="confetti" aria-hidden="true">{pieces.map((p, i) => <i key={i} style={{ left: p.left, animationDelay: p.delay, background: p.color, transform: `rotate(${p.rotate})` }} />)}</div>;
+  return <div className="poster-confetti" aria-hidden="true">{pieces.map((p, i) => <i key={i} style={{ left: p.left, background: p.color, animationDelay: p.delay }} />)}</div>;
 }
 
 export default function Home() {
-  const [revealed, setRevealed] = useState(false);
-  const [active, setActive] = useState(0);
-  const [soundOn, setSoundOn] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const stageRef = useRef<HTMLDivElement>(null);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
 
   useEffect(() => {
-    const onMove = (e: MouseEvent) => {
+    const onPointer = (e: MouseEvent) => {
       if (window.matchMedia("(pointer: coarse)").matches) return;
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      setTilt({ x: x * 4, y: y * 4 });
+      setTilt({ x: (e.clientX / window.innerWidth - 0.5) * 5, y: (e.clientY / window.innerHeight - 0.5) * -5 });
     };
-    const onOrientation = (e: DeviceOrientationEvent) => {
-      setTilt({ x: Math.max(-7, Math.min(7, (e.gamma || 0) / 5)), y: Math.max(-7, Math.min(7, ((e.beta || 0) - 35) / 5)) });
-    };
-    window.addEventListener("mousemove", onMove);
+    const onOrientation = (e: DeviceOrientationEvent) => setTilt({ x: Math.max(-5, Math.min(5, (e.gamma || 0) / 7)), y: Math.max(-5, Math.min(5, ((e.beta || 0) - 35) / -7)) });
+    window.addEventListener("mousemove", onPointer);
     window.addEventListener("deviceorientation", onOrientation);
-    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("deviceorientation", onOrientation); };
+    return () => { window.removeEventListener("mousemove", onPointer); window.removeEventListener("deviceorientation", onOrientation); };
   }, []);
 
-  const handleReveal = () => {
-    requestMotionPermission();
-    setRevealed(true);
-    document.getElementById("memories")?.scrollIntoView({ behavior: "smooth" });
-  };
+  const openMemory = (index: number) => { setSelected(index); setCelebrate(true); window.setTimeout(() => setCelebrate(false), 2400); };
 
   return (
-    <main className="birthday-page" ref={stageRef} style={{ "--tilt-x": `${tilt.x}deg`, "--tilt-y": `${tilt.y}deg` } as React.CSSProperties}>
-      {revealed && <Confetti />}
-      <div className="grain" />
-      <header className="topbar">
-        <span className="topbar-mark"><Sparkles size={14} /> CYDAY 2026</span>
-        <button className="sound-button" onClick={() => setSoundOn(!soundOn)} aria-label="사운드 토글">{soundOn ? <Volume2 size={16} /> : <VolumeX size={16} />} {soundOn ? "sound on" : "silent mode"}</button>
-      </header>
-
-      <section className="hero container">
-        <div className="hero-copy">
-          <p className="eyebrow">a little surprise, made just for you</p>
-          <h1>채영아,<br /><em>생일 축하해!</em></h1>
-          <p className="hero-lede">오늘의 주인공은 언제나처럼<br className="mobile-only" /> 너야. 우리가 모은 예쁜 순간들을<br className="mobile-only" /> 살짝 펼쳐볼게.</p>
-          <button className="reveal-button" onClick={handleReveal}><span>선물 열어보기</span><ArrowDown size={18} /></button>
-          <div className="scroll-cue"><span className="scroll-line" /> scroll to unwrap</div>
+    <main className="poster-page">
+      {celebrate && <Confetti />}
+      <div className="poster-topbar"><span><Sparkles size={13} /> CYDAY 2026</span><span className="tilt-label">tilt / tap the cards</span></div>
+      <section className="poster-frame" style={{ transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)` }}>
+        <img className="poster-art" src={asset("final_poster_used_for_split.png")} alt="채영아 생일 축하해 포스터" />
+        <div className="poster-hotspots" aria-label="생일 축하 카드 사진들">
+          {memories.map((memory, i) => <button key={memory[0]} className={`hotspot hotspot-${i + 1}`} onClick={() => openMemory(i)} aria-label={`${memory[1]} 카드 열기`}><span>♡</span></button>)}
         </div>
-
-        <div className="poster-wrap" style={{ transform: `rotateX(var(--tilt-y)) rotateY(var(--tilt-x))` }}>
-          <div className="poster-shadow" />
-          <div className="poster-card">
-            <img className="poster-base" src={`${A}01_center_pink_wash.png`} alt="핑크 종이 질감" />
-            <img className="poster-decor decor-left" src={`${A}07_left_bouquet_and_mid_heart.png`} alt="꽃 장식" />
-            <img className="poster-decor decor-right" src={`${A}08_right_flower_and_heart.png`} alt="꽃과 하트 장식" />
-            <img className="poster-decor decor-top" src={`${A}03_top_ribbon.png`} alt="리본" />
-            <img className="poster-decor decor-cat" src={`${A}11_cat_doodle.png`} alt="고양이 낙서" />
-            <div className="poster-type">HAPPY<br /><span>BIRTHDAY</span></div>
-            <div className="poster-name">CHAeyoung</div>
-            <div className="poster-date">21 · 09 · 2026</div>
-            <div className="tilt-hint"><span>✦</span> tilt your device <span>✦</span></div>
-          </div>
-        </div>
-        <div className="hero-sticker sticker-one">for the<br /><strong>best day</strong></div>
-        <div className="hero-sticker sticker-two">xoxo<br />♡</div>
+        <button className="poster-scroll" onClick={() => document.getElementById("after-poster")?.scrollIntoView({ behavior: "smooth" })} aria-label="아래로 스크롤"><ArrowDown size={16} /></button>
       </section>
-
-      <section className={`reveal-band ${revealed ? "is-revealed" : ""}`}>
-        <div className="container reveal-inner">
-          <div className="letter-tiles">{letters.map((src, i) => <img key={src} src={src} alt={i === 0 ? "채영 생일 축하 타이포그래피" : ""} />)}</div>
-          <p>오늘 하루만큼은 네가 받는 사랑을<br />전부 느꼈으면 좋겠어.</p>
-          <button className="circle-heart" onClick={() => document.getElementById("message")?.scrollIntoView({ behavior: "smooth" })}><Heart fill="currentColor" size={22} /></button>
-        </div>
-      </section>
-
-      <section id="memories" className="memories-section container">
-        <div className="section-intro"><p className="eyebrow">little moments, big love</p><h2>너와 함께라서<br /><em>더 반짝였던 장면들</em></h2><p>카드를 톡톡 눌러보면<br />사진 속 마음이 열려.</p></div>
-        <div className="memory-grid">{photos.map(([src, title, copy], i) => <article key={src} className={`memory-card card-${i + 1} ${active === i ? "active" : ""}`} onClick={() => setActive(i)}><div className="photo-frame"><img src={src} alt={title} /><span className="photo-index">0{i + 1}</span></div><div className="memory-copy"><span>{title}</span><p>{copy}</p></div></article>)}</div>
-        <div className="memory-controls"><button onClick={() => setActive((active + photos.length - 1) % photos.length)} aria-label="이전 카드"><ChevronLeft /></button><span>{String(active + 1).padStart(2, "0")} / 06</span><button onClick={() => setActive((active + 1) % photos.length)} aria-label="다음 카드"><ChevronRight /></button></div>
-      </section>
-
-      <section id="message" className="message-section">
-        <img className="message-flower" src={`${A}14_bottom_right_note_and_flowers.png`} alt="꽃 장식" />
-        <div className="message-paper">
-          <span className="paper-label">a note for you</span>
-          <h2>채영에게,</h2>
-          <p>네가 태어난 날부터 세상이 조금 더 다정해졌다는 걸, 나는 매일 느껴.</p>
-          <p>좋은 날도, 조금 지치는 날도 우리 같이 천천히 지나가자. 네가 좋아하는 것들로 가득한 한 해가 되길, 그리고 그 옆에 내가 오래오래 있길 바라.</p>
-          <p className="signature">늘 너의 편, <strong>♡</strong></p>
-          <div className="paper-stamp">LOVE<br /><span>YOU</span></div>
-        </div>
-      </section>
-      <footer><span>made with all my heart</span><span>채영아, 오늘도 빛나</span></footer>
+      <section id="after-poster" className="after-poster"><p className="after-kicker">a tiny interactive surprise</p><h1>포스터 속 카드를<br /><em>톡톡 눌러봐</em></h1><p>사진마다 채영이를 위한 작은 문장이 숨어 있어.<br />기기를 살짝 기울이면 포스터도 같이 흔들려.</p><div className="after-line"><span /> 08 little wishes <span /></div></section>
+      {selected !== null && <div className="memory-modal" role="dialog" aria-modal="true" aria-label="생일 카드 상세" onClick={() => setSelected(null)}><div className="memory-sheet" onClick={e => e.stopPropagation()}><button className="close-memory" onClick={() => setSelected(null)} aria-label="닫기"><X size={19} /></button><div className="memory-photo"><img src={asset(memories[selected][0])} alt={memories[selected][1]} /></div><div className="memory-details"><span className="memory-tag">{memories[selected][3]}</span><h2>{memories[selected][1]}</h2><p>{memories[selected][2]}</p><div className="memory-heart"><Heart fill="currentColor" size={16} /> for chaeyoung</div></div></div></div>}
     </main>
   );
 }
-
-// Allow the browser to ask for motion access on iOS without interrupting the first paint.
-export function requestMotionPermission() { const w = window as Window & { DeviceOrientationEvent?: typeof DeviceOrientationEvent & { requestPermission?: () => Promise<string> } }; return w.DeviceOrientationEvent?.requestPermission?.(); }
