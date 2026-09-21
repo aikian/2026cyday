@@ -43,7 +43,7 @@ export default function Home() {
   return (
     <main className="poster-page">
       {celebrate && <Confetti />}
-      <div className="poster-topbar"><span><Sparkles size={13} /> CYDAY 2026</span><span className="tilt-label">tilt / tap the cards</span></div>
+      <div className="poster-topbar"><span><Sparkles size={13} /> CYDAY 2026</span><span className="tilt-label">parallax / motion enabled</span></div>
       <section className="poster-frame" style={{ transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)` }}>
         <img className="poster-art" src={asset("final_poster_used_for_split.png")} alt="채영아 생일 축하해 포스터" />
         <div className="poster-hotspots" aria-label="생일 축하 카드 사진들">
@@ -51,8 +51,8 @@ export default function Home() {
         </div>
         <button className="poster-scroll" onClick={() => document.getElementById("after-poster")?.scrollIntoView({ behavior: "smooth" })} aria-label="아래로 스크롤"><ArrowDown size={16} /></button>
       </section>
-      <section id="after-poster" className="after-poster"><p className="after-kicker">a tiny interactive surprise</p><h1>포스터 속 카드를<br /><em>톡톡 눌러봐</em></h1><p>사진마다 채영이를 위한 작은 문장이 숨어 있어.<br />기기를 살짝 기울이면 포스터도 같이 흔들려.</p><div className="after-line"><span /> 08 little wishes <span /></div></section>
-      {selected !== null && <div className="memory-modal" role="dialog" aria-modal="true" aria-label="생일 카드 상세" onClick={() => setSelected(null)}><div className="memory-sheet" onClick={e => e.stopPropagation()}><button className="close-memory" onClick={() => setSelected(null)} aria-label="닫기"><X size={19} /></button><div className="memory-photo"><img src={asset(memories[selected][0])} alt={memories[selected][1]} /></div><div className="memory-details"><span className="memory-tag">{memories[selected][3]}</span><h2>{memories[selected][1]}</h2><p>{memories[selected][2]}</p><div className="memory-heart"><Heart fill="currentColor" size={16} /> for chaeyoung</div></div></div></div>}
+      <section id="after-poster" className="after-poster"><p className="after-kicker">AN EDITORIAL BIRTHDAY ARCHIVE</p><h1>한 장의 포스터에 담은<br /><em>여덟 개의 마음</em></h1><p>사진과 문장으로 이어지는 작은 아카이브.<br />카드를 선택하면 각 장면의 메시지가 펼쳐집니다.</p><div className="after-line"><span /> 08 NOTES / 2026.09.22 <span /></div></section>
+      {selected !== null && <div className="memory-modal" role="dialog" aria-modal="true" aria-label="생일 카드 상세" onClick={() => setSelected(null)}><div className="memory-sheet" onClick={e => e.stopPropagation()}><button className="close-memory" onClick={() => setSelected(null)} aria-label="닫기"><X size={19} /></button><div className="memory-photo"><img src={asset(memories[selected][0])} alt={memories[selected][1]} /></div><div className="memory-details"><span className="memory-tag">FIELD NOTE / 0{selected + 1}</span><h2>{memories[selected][1]}</h2><p>{memories[selected][2]}</p><div className="memory-heart"><Heart fill="currentColor" size={16} /> {memories[selected][3]}</div></div></div></div>}
     </main>
   );
 }
